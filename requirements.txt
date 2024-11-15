@@ -1,0 +1,9 @@
+apscheduler
+psutil
+requests
+matplotlib
+Pillow
+colorama
+pytesseract
+baidu-aip
+apscheduler

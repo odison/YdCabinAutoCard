@@ -1,0 +1,13 @@
+tessdata
+.idea
+test.py
+./screenshot.png
+*.py[cod]
+common/__pycache__
+config/configure-dev.conf
+build/*
+dist/*
+*.spec
+screenshot.png
+logs/*
+venv/*
