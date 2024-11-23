@@ -32,6 +32,9 @@ CONFIG.read('./config/configure.conf', encoding='utf-8')
 # 全局变量
 # 每天班次list
 WORKS = []
+
+MORNING = 0
+AFTERNOON = 0
 #
 REST_REGION = CONFIG.get('work', 'rest_region')
 REST_TEXT = CONFIG.get('work', 'rest_text')
@@ -95,13 +98,53 @@ def init_simulator():
     print(Fore.GREEN+"初始化模拟器完成\n")
 
 
+def check_work():
+    global MORNING, AFTERNOON
+    now = time.localtime(time.time())
+
+    if now.tm_hour <= 12:
+        return MORNING
+    if now.tm_hour > 12:
+        return AFTERNOON
+
+
+def set_work():
+    global MORNING, AFTERNOON
+    now = time.localtime(time.time())
+
+    if now.tm_hour <= 12:
+        MORNING = 1
+    if now.tm_hour > 12:
+        AFTERNOON = 1
+
+
+def clear_work():
+    global MORNING, AFTERNOON
+    print(Fore.CYAN + "开始清空当日班次..")
+    if MORNING == 1:
+        MORNING = 0
+    if AFTERNOON == 1:
+        AFTERNOON = 0
+
+
 def go_check():
 
     print(Fore.CYAN + "\n" + time.strftime("%Y-%m-%d-%H:%M:%S", time.localtime()) + " 开始例行检查")
-    random_sleep = random.randint(5, 30)
+
+    if check_work():
+        print(Fore.CYAN + "当前时间段已经有执行记录，跳过")
+        return
+
+    random_sleep = random.randint(60, 300)
     # print_works()
     print(Fore.CYAN + "随机等待 %d s" % random_sleep)
     time.sleep(random_sleep)
+
+    if not android.check_devices():
+        print(Fore.RED + "模拟器故障，重启模拟器，跳过本次检查")
+        logger.error("模拟器故障，重启模拟器，跳过本次检查")
+        init_simulator()
+        return
     # 网络故障
     if not send_http_packet('www.baidu.com'):
         print(Fore.RED+"网络故障，跳过本次检查")
@@ -128,8 +171,8 @@ def go_check():
         now.tm_hour, now.tm_min, now.tm_sec
     )
     # 成功之后发邮件
-
     send_email(SCREEN_FILE, title, CONFIG)
+    set_work()
     print(Fore.GREEN + time.strftime("%Y-%m-%d-%H:%M:%S", time.localtime()) + " 本次检查完成\n")
 
 
@@ -155,6 +198,7 @@ if __name__ == '__main__':
     else:
         print(Fore.GREEN + "邮箱配置检查通过")
 
+    go_check()
     # if not is_ocr_config_passed():
     #     print(Fore.RED + "百度OCR配置检查失败，无法继续运行")
     #     input("\n输入任意键退出...\n")
@@ -163,10 +207,10 @@ if __name__ == '__main__':
     #     print(Fore.GREEN + "百度OCR配置检查通过")
     scheduler = BlockingScheduler()
     scheduler.add_job(go_check, CronTrigger(
-        day="*", hour="10"
+        day="*", hour="9-11", minute="*/10"
     ))
     scheduler.add_job(go_check, CronTrigger(
-        day="*", hour="16"
+        day="*", hour="14-16", minute="*/10"
     ))
     # scheduler.add_job(go_check, CronTrigger(
     #     day="*", hour="10-16", minute="*"
