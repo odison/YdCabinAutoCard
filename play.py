@@ -215,6 +215,9 @@ if __name__ == '__main__':
     # scheduler.add_job(go_check, CronTrigger(
     #     day="*", hour="10-16", minute="*"
     # ))
+    scheduler.add_job(clear_work, CronTrigger(
+        day="*", hour="21-23"
+    ))
     print(Fore.GREEN + "调度器开始运行..")
     scheduler.start()
     # go_check()
