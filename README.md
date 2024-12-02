@@ -118,27 +118,7 @@ adb shell dumpsys window | findstr mCurrentFocus
    ```
 3. 配置  
 配置文件是config目录下的 configure.conf  
-3.1 百度OCR  
-在[百度OCR平台](https://cloud.baidu.com/product/ocr)上创建应用申请 API Key 和 Secret Key  
-    ```sh
-    # 在配置文件中配置，ocr 普通识别文字接口 每天有 50000 次调用，
-    # 但是只有2 rps，所以只能各用各的
-    [baidu_api]
-    APP_ID = 
-    API_KEY = 
-    SECRET_KEY = 
-    ```
-    如果是使用虚拟机，需要设置高精度识别，不然识别出来的班次信息会有所不对，在以下代码修改：
-    ```bash
-    # 代码目录：common/ocr.py 
-    # line 302 可以自行选用 高精度识别还是普通识别
-    # 高精度识别 日免费调用 500 次 额度
-    response = client.basicAccurate(image_data)
-    # 普通识别 日免费调用 50000 次 额度
-    # response = client.basicGeneral(image_data)
-    ```  
-
-    3.2 邮箱SMTP设置
+3.1 邮箱SMTP设置
     ```sh
     [mail]
     # 发件人邮箱地址
