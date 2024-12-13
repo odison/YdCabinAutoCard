@@ -26,7 +26,8 @@ class Android:
         # app 退出
         self.cmd_kill_cphr = 'adb shell am force-stop com.cptc.cphr'
         # 启动 省区经营管家
-        self.cmd_open_yd = 'adb shell am start -n com.yunda.ydcabin/com.yunda.ydcabin.function.MainActivity'
+        # self.cmd_open_yd = 'adb shell am start -n com.yunda.ydcabin/com.yunda.ydcabin.function.MainActivity'
+        self.cmd_open_yd = 'adb shell am start -n com.yunda.ydcabin/.SplashActivity'
         # 省区经营管家退出
         self.cmd_kill_yd = 'adb shell am force-stop com.yunda.ydcabin'
         # 滑动解锁

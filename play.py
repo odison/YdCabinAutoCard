@@ -40,6 +40,10 @@ REST_REGION = CONFIG.get('work', 'rest_region')
 REST_TEXT = CONFIG.get('work', 'rest_text')
 USE_SIMULATOR = int(CONFIG.get('simulator', 'use'))
 
+# TAP_POSITION_X = int(CONFIG.get('position', 'x'))
+# TAP_POSITION_Y = int(CONFIG.get('position', 'y'))
+
+
 TODAY_REST = 0
 # REFRESH_RUNNING = 0
 # CLEAR_RUNNING = 0
@@ -125,6 +129,7 @@ def clear_work():
         MORNING = 0
     if AFTERNOON == 1:
         AFTERNOON = 0
+    init_simulator()
 
 
 def go_check():
@@ -157,10 +162,13 @@ def go_check():
     android.open_yd()
     # card
     # android.tap_postion(x, y)
-    android.screen_cap()
+
     # 停留10s
-    print(Fore.WHITE + "停留 10 s" )
-    time.sleep(10)
+    print(Fore.WHITE + "停留 100 s" )
+    time.sleep(100)
+    # android.tap_postion(TAP_POSITION_X, TAP_POSITION_Y)
+    # time.sleep(1)
+    android.screen_cap()
     # close
     android.close_yd()
 
