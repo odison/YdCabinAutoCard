@@ -13,6 +13,7 @@ import logging
 from colorama import init, Fore
 import re
 # from common.work import Work
+from common.ocr import ocr_img_region_baidu
 from common.phone import Android
 from common.phone import Simulator
 from apscheduler.schedulers.blocking import BlockingScheduler
@@ -38,10 +39,14 @@ AFTERNOON = 0
 #
 REST_REGION = CONFIG.get('work', 'rest_region')
 REST_TEXT = CONFIG.get('work', 'rest_text')
+
+LOGIN_REGION = CONFIG.get('login', 'region')
+LOGIN_TEXT = CONFIG.get('login', 'text')
+
 USE_SIMULATOR = int(CONFIG.get('simulator', 'use'))
 
-# TAP_POSITION_X = int(CONFIG.get('position', 'x'))
-# TAP_POSITION_Y = int(CONFIG.get('position', 'y'))
+TAP_POSITION_X = int(CONFIG.get('position', 'x'))
+TAP_POSITION_Y = int(CONFIG.get('position', 'y'))
 
 
 TODAY_REST = 0
@@ -77,18 +82,18 @@ def is_mail_config_passed():
     return True
 
 
-# def is_ocr_config_passed():
-#     config = CONFIG
-#     APP_ID = config.get('baidu_api', 'APP_ID').replace(' ', '').strip()
-#     API_KEY = config.get('baidu_api', 'API_KEY').replace(' ', '').strip()
-#     SECRET_KEY = config.get('baidu_api', 'SECRET_KEY').replace(' ', '').strip()
-#     # print(APP_ID)
-#     # print(len(APP_ID))
-#     if len(APP_ID) == 0 \
-#             or len(API_KEY) == 0 \
-#             or len(SECRET_KEY) == 0:
-#         return False
-#     return True
+def is_ocr_config_passed():
+    config = CONFIG
+    APP_ID = config.get('baidu_api', 'APP_ID').replace(' ', '').strip()
+    API_KEY = config.get('baidu_api', 'API_KEY').replace(' ', '').strip()
+    SECRET_KEY = config.get('baidu_api', 'SECRET_KEY').replace(' ', '').strip()
+    # print(APP_ID)
+    # print(len(APP_ID))
+    if len(APP_ID) == 0 \
+            or len(API_KEY) == 0 \
+            or len(SECRET_KEY) == 0:
+        return False
+    return True
 
 
 def init_simulator():
@@ -129,7 +134,19 @@ def clear_work():
         MORNING = 0
     if AFTERNOON == 1:
         AFTERNOON = 0
-    init_simulator()
+    # init_simulator()
+
+
+def check_login():
+    image = Image.open(SCREEN_FILE)
+    text = ocr_img_region_baidu(image, CONFIG, LOGIN_REGION)
+    print(text)
+    if LOGIN_TEXT in text[0]:
+        print(Fore.GREEN + "ocr 识别到 " + LOGIN_TEXT )
+        set_work()
+    else:
+        print(Fore.RED + "ocr 未识别出 " + LOGIN_TEXT)
+
 
 
 def go_check():
@@ -140,7 +157,7 @@ def go_check():
         print(Fore.CYAN + "当前时间段已经有执行记录，跳过")
         return
 
-    random_sleep = random.randint(60, 300)
+    random_sleep = random.randint(60, 100)
     # print_works()
     print(Fore.CYAN + "随机等待 %d s" % random_sleep)
     time.sleep(random_sleep)
@@ -166,21 +183,24 @@ def go_check():
     # 停留10s
     print(Fore.WHITE + "停留 100 s" )
     time.sleep(100)
-    # android.tap_postion(TAP_POSITION_X, TAP_POSITION_Y)
-    # time.sleep(1)
+    android.tap_postion(TAP_POSITION_X, TAP_POSITION_Y)
+    time.sleep(1)
     android.screen_cap()
     # close
     android.close_yd()
 
-    # send mail
-    title = '%s 省区经营管家 [%d-%d-%d %d:%d:%d]' % (
-        'open',
-        now.tm_year, now.tm_mon, now.tm_mday,
-        now.tm_hour, now.tm_min, now.tm_sec
-    )
-    # 成功之后发邮件
-    send_email(SCREEN_FILE, title, CONFIG)
-    set_work()
+    check_login()
+
+    if check_work() == 1:
+        # send mail
+        title = '%s 省区经营管家 [%d-%d-%d %d:%d:%d]' % (
+            'open',
+            now.tm_year, now.tm_mon, now.tm_mday,
+            now.tm_hour, now.tm_min, now.tm_sec
+        )
+        # 成功之后发邮件
+        send_email(SCREEN_FILE, title, CONFIG)
+    # set_work()
     print(Fore.GREEN + time.strftime("%Y-%m-%d-%H:%M:%S", time.localtime()) + " 本次检查完成\n")
 
 
@@ -206,13 +226,14 @@ if __name__ == '__main__':
     else:
         print(Fore.GREEN + "邮箱配置检查通过")
 
+    if not is_ocr_config_passed():
+        print(Fore.RED + "百度OCR配置检查失败，无法继续运行")
+        input("\n输入任意键退出...\n")
+        exit(1)
+    else:
+        print(Fore.GREEN + "百度OCR配置检查通过")
     go_check()
-    # if not is_ocr_config_passed():
-    #     print(Fore.RED + "百度OCR配置检查失败，无法继续运行")
-    #     input("\n输入任意键退出...\n")
-    #     exit(1)
-    # else:
-    #     print(Fore.GREEN + "百度OCR配置检查通过")
+
     scheduler = BlockingScheduler()
     scheduler.add_job(go_check, CronTrigger(
         day="*", hour="9-11", minute="*/10"
