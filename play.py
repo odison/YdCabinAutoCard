@@ -184,7 +184,8 @@ def go_check():
     print(Fore.WHITE + "停留 100 s" )
     time.sleep(100)
     android.tap_postion(TAP_POSITION_X, TAP_POSITION_Y)
-    time.sleep(1)
+    print(Fore.WHITE + "停留 30 s,检测登录状态")
+    time.sleep(30)
     android.screen_cap()
     # close
     android.close_yd()
