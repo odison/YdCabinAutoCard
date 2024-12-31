@@ -49,6 +49,9 @@ TAP_POSITION_X = int(CONFIG.get('position', 'x'))
 TAP_POSITION_Y = int(CONFIG.get('position', 'y'))
 
 
+SKIP_POSITION_X = int(CONFIG.get('update', 'x'))
+SKIP_POSITION_Y = int(CONFIG.get('update', 'y'))
+
 TODAY_REST = 0
 # REFRESH_RUNNING = 0
 # CLEAR_RUNNING = 0
@@ -141,6 +144,9 @@ def check_login():
     image = Image.open(SCREEN_FILE)
     text = ocr_img_region_baidu(image, CONFIG, LOGIN_REGION)
     print(text)
+    if not text:
+        print(Fore.RED + "ocr 返回为空")
+        return
     if LOGIN_TEXT in text[0]:
         print(Fore.GREEN + "ocr 识别到 " + LOGIN_TEXT )
         set_work()
@@ -183,6 +189,9 @@ def go_check():
     # 停留10s
     print(Fore.WHITE + "停留 100 s" )
     time.sleep(100)
+    android.tap_postion(SKIP_POSITION_X, SKIP_POSITION_Y)
+    print(Fore.WHITE + "停留 5 s,跳过更新")
+    time.sleep(5)
     android.tap_postion(TAP_POSITION_X, TAP_POSITION_Y)
     print(Fore.WHITE + "停留 30 s,检测登录状态")
     time.sleep(30)
