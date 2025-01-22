@@ -160,6 +160,16 @@ adb shell dumpsys window | findstr mCurrentFocus
    # 已登录字符串的坐标
    region = 312,690,412,728
    text = 已登录
+   
+   [position]
+   # 点击跳转到已登录界面
+   x=99
+   y=287
+   
+   [update]
+   # 跳过更新按钮位置
+   x=244
+   y=789
    ```
       
 
