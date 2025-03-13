@@ -180,7 +180,8 @@ def go_check():
         return
 
     now = time.localtime(time.time())
-
+    # close
+    android.close_yd()
     # open app
     android.open_yd()
     # card
@@ -196,8 +197,7 @@ def go_check():
     print(Fore.WHITE + "停留 30 s,检测登录状态")
     time.sleep(30)
     android.screen_cap()
-    # close
-    android.close_yd()
+
 
     check_login()
 
