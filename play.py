@@ -254,12 +254,15 @@ if __name__ == '__main__':
 
     scheduler = BlockingScheduler()
     scheduler.add_job(go_check, CronTrigger(
-        day="*", hour="9-11", minute="*/10"
+        day="*", hour="9-16", minute="*/10"
     ))
-    scheduler.add_job(go_check, CronTrigger(
-        day="*", hour="14-16", minute="*/10"
-    ))
+    # scheduler.add_job(go_check, CronTrigger(
+    #     day="*", hour="13-16", minute="*/10"
+    # ))
 
+    # scheduler.add_job(heart, CronTrigger(
+    #     day="*", hour="1-23", minute="*/10"
+    # ))
     scheduler.add_job(heart, CronTrigger(
         day="*", hour="17-23", minute="*/10"
     ))
