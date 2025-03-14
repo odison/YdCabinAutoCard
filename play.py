@@ -154,12 +154,19 @@ def check_login():
         print(Fore.RED + "ocr 未识别出 " + LOGIN_TEXT)
 
 
+def heart():
+    # close
+    android.close_yd()
+    # open app
+    android.open_yd()
+
 
 def go_check():
 
     print(Fore.CYAN + "\n" + time.strftime("%Y-%m-%d-%H:%M:%S", time.localtime()) + " 开始例行检查")
 
     if check_work():
+        heart()
         print(Fore.CYAN + "当前时间段已经有执行记录，跳过")
         return
 
@@ -180,6 +187,7 @@ def go_check():
         return
 
     now = time.localtime(time.time())
+
     # close
     android.close_yd()
     # open app
@@ -250,6 +258,13 @@ if __name__ == '__main__':
     ))
     scheduler.add_job(go_check, CronTrigger(
         day="*", hour="14-16", minute="*/10"
+    ))
+
+    scheduler.add_job(heart, CronTrigger(
+        day="*", hour="17-23", minute="*/10"
+    ))
+    scheduler.add_job(heart, CronTrigger(
+        day="*", hour="0-8", minute="*/10"
     ))
     # scheduler.add_job(go_check, CronTrigger(
     #     day="*", hour="10-16", minute="*"
