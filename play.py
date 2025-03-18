@@ -166,7 +166,7 @@ def go_check():
     print(Fore.CYAN + "\n" + time.strftime("%Y-%m-%d-%H:%M:%S", time.localtime()) + " 开始例行检查")
 
     if check_work():
-        heart()
+        # heart()
         print(Fore.CYAN + "当前时间段已经有执行记录，跳过")
         return
 
@@ -188,8 +188,7 @@ def go_check():
 
     now = time.localtime(time.time())
 
-    # close
-    android.close_yd()
+
     # open app
     android.open_yd()
     # card
@@ -206,7 +205,8 @@ def go_check():
     time.sleep(30)
     android.screen_cap()
 
-
+    # close
+    android.close_yd()
     check_login()
 
     if check_work() == 1:
@@ -225,11 +225,16 @@ def go_check():
 
 
 if __name__ == '__main__':
+
+    # android.screen_cap()
+    # exit(1)
+
     print(Fore.CYAN + "开始检查运行环境")
 
     # init_simulator()
     android.connect('127.0.0.1:21503')
 
+    clear_work()
     if not android.check_devices():
         print(Fore.RED + "adb 未检测到 设备，无法继续运行")
         input("\n输入任意键退出...\n")
@@ -256,22 +261,14 @@ if __name__ == '__main__':
     scheduler.add_job(go_check, CronTrigger(
         day="*", hour="9-16", minute="*/10"
     ))
-    # scheduler.add_job(go_check, CronTrigger(
-    #     day="*", hour="13-16", minute="*/10"
-    # ))
 
     # scheduler.add_job(heart, CronTrigger(
-    #     day="*", hour="1-23", minute="*/10"
+    #     day="*", hour="17-23", minute="*/10"
     # ))
-    scheduler.add_job(heart, CronTrigger(
-        day="*", hour="17-23", minute="*/10"
-    ))
-    scheduler.add_job(heart, CronTrigger(
-        day="*", hour="0-8", minute="*/10"
-    ))
-    # scheduler.add_job(go_check, CronTrigger(
-    #     day="*", hour="10-16", minute="*"
+    # scheduler.add_job(heart, CronTrigger(
+    #     day="*", hour="0-8", minute="*/10"
     # ))
+
     scheduler.add_job(clear_work, CronTrigger(
         day="*", hour="21-23"
     ))
